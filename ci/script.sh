@@ -9,7 +9,9 @@ main() {
             ;;
     esac
 
-    [ $TRAVIS_RUST_VERSION = nightly ] && cargo check --features const-fn
+    if [ $TRAVIS_RUST_VERSION = nightly ]; then
+        cargo check --features const-fn
+    fi
 }
 
 main
