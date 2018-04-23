@@ -1,7 +1,12 @@
 [package]
-name = "hash32-derive"
-version = "0.1.0"
 authors = ["Jorge Aparicio <jorge@japaric.io>"]
+categories = ["no-std"]
+description = "Macros 1.1 implementation of #[derive(Hash32)]"
+keywords = ["32-bit", "hash", "derive"]
+license = "MIT OR Apache-2.0"
+name = "hash32-derive"
+repository = "https://github.com/japaric/hash32"
+version = "0.1.0"
 
 [lib]
 proc-macro = true
