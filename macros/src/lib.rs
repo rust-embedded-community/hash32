@@ -1,12 +1,14 @@
 extern crate proc_macro;
+extern crate proc_macro2;
 #[macro_use]
 extern crate quote;
 #[macro_use]
 extern crate syn;
 
 use proc_macro::TokenStream;
+use proc_macro2::Span;
 use quote::Tokens;
-use syn::{Data, DeriveInput, Fields, GenericParam, Generics, Ident};
+use syn::{Data, DeriveInput, Fields, GenericParam, Generics, Ident, IntSuffix, LitInt};
 
 #[proc_macro_derive(Hash32)]
 pub fn derive_hash32(input: TokenStream) -> TokenStream {
@@ -54,7 +56,8 @@ fn compute_hash(data: &Data) -> Tokens {
                 }
             }
             Fields::Unnamed(ref fields) => {
-                let indices = 0..fields.unnamed.len();
+                let indices = (0..fields.unnamed.len())
+                    .map(|i| LitInt::new(i as u64, IntSuffix::None, Span::call_site()));
                 quote! {
                     #(
                         hash32::Hash::hash(&self.#indices, _h);

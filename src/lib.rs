@@ -6,12 +6,14 @@
 //! function to pull in a bunch of slow 64-bit compiler intrinsics (software implementations of
 //! 64-bit operations).
 //!
-//! # Relationship to [`core::hash`]
+//! # Relationship to `core::hash`
 //!
-//! This crate exposes the same interfaces you'll find in `core::hash`: `Hash`, `Hasher`,
+//! This crate exposes the same interfaces you'll find in [`core::hash`]: `Hash`, `Hasher`,
 //! `BuildHasher` and `BuildHasherDefault`. The main difference is that `hash32::Hasher::finish`
 //! returns a `u32` instead of `u64`, and the contract of `hash32::Hasher` forbids the implementer
 //! from performing 64-bit (or 128-bit) operations while computing the hash.
+//!
+//! [`core::hash`]: https://doc.rust-lang.org/std/hash/index.html
 //!
 //! # `#[derive(Hash32)]`
 //!
@@ -37,9 +39,10 @@
 //! # Future
 //!
 //! In the future we'd like to deprecate this crate in favor of making `core::hash::Hasher` generic
-//! over the size of the computed hash. Below is shown the planned change:
+//! over the size of the computed hash. Below is shown the planned change (but it doesn't work due
+//! to limitations in the `associated_type_defaults` feature):
 //!
-//! ```
+//! ``` ignore
 //! #![feature(associated_type_defaults)]
 //!
 //! trait Hasher {
