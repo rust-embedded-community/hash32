@@ -281,3 +281,56 @@ impl<'a, T: ?Sized + Hash> Hash for &'a mut T {
         (**self).hash(state);
     }
 }
+
+impl Hash for () {
+    fn hash<H: Hasher>(&self, _state: &mut H) {}
+}
+
+macro_rules! tuple {
+    ( $($name:ident)+) => (
+        impl<$($name: Hash),*> Hash for ($($name,)*)
+            where
+            last_type!($($name,)+): ?Sized
+        {
+            #[allow(non_snake_case)]
+            fn hash<S: Hasher>(&self, state: &mut S) {
+                let ($(ref $name,)*) = *self;
+                $($name.hash(state);)*
+            }
+        }
+    );
+}
+
+macro_rules! last_type {
+    ($a:ident,) => { $a };
+    ($a:ident, $($rest_a:ident,)+) => { last_type!($($rest_a,)+) };
+}
+
+tuple! { A }
+tuple! { A B }
+tuple! { A B C }
+tuple! { A B C D }
+tuple! { A B C D E }
+tuple! { A B C D E F }
+tuple! { A B C D E F G }
+tuple! { A B C D E F G H }
+tuple! { A B C D E F G H I }
+tuple! { A B C D E F G H I J }
+tuple! { A B C D E F G H I J K }
+tuple! { A B C D E F G H I J K L }
+
+#[cfg(test)]
+mod test {
+    use super::{Hash, Hasher, FnvHasher};
+    #[test]
+    fn hashes_tuples() {
+        let mut h = FnvHasher::default();
+        ().hash(&mut h);
+        (1_usize,).hash(&mut h);
+        (1_u8, 2_i8).hash(&mut h);
+        (1_u16, 2_i16, 3_u32).hash(&mut h);
+        (1_i32, 2_u64, 3_i64, true).hash(&mut h);
+        (1_isize, 'a', "abc", [1u32, 2, 3, 4], false).hash(&mut h);
+        h.finish();
+    }
+}
