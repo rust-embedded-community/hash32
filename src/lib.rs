@@ -24,7 +24,7 @@
 //!
 //! ## 2015 edition
 //!
-//! ```
+//! ``` ignore
 //! extern crate hash32;
 //! #[macro_use]
 //! extern crate hash32_derive;
@@ -37,7 +37,7 @@
 //!
 //! ## 2018 edition
 //!
-//! ```
+//! ``` ignore
 //! use hash32_derive::Hash32;
 //!
 //! #[derive(Hash32)]
