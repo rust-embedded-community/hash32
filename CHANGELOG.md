@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [v0.1.2] - 2019-11-14
+
+### Updated
+
+- Included MSRV in the documentation; also added examples for 2015 and 2018
+  editions.
+
 ## [v0.1.1] - 2019-11-14
 
 ### Added
@@ -17,5 +24,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 Initial release
 
-[Unreleased]: https://github.com/japaric/hash32/compare/v0.1.1...HEAD
+[Unreleased]: https://github.com/japaric/hash32/compare/v0.1.2...HEAD
+[v0.1.2]: https://github.com/japaric/hash32/compare/v0.1.1...v0.1.2
 [v0.1.1]: https://github.com/japaric/hash32/compare/v0.1.0...v0.1.1
