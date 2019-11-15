@@ -53,6 +53,11 @@
 //! - [Fowler-Noll-Vo](struct.FnvHasher.html)
 //! - [MurmurHash3](struct.Murmur3Hasher.html)
 //!
+//! # MSRV
+//!
+//! This crate is guaranteed to compile on stable Rust 1.25 and up. It *might* compile on older
+//! versions but that may change in any new patch release.
+//!
 //! # Future
 //!
 //! In the future we'd like to deprecate this crate in favor of making `core::hash::Hasher` generic
