@@ -19,7 +19,13 @@
 //!
 //! The easiest way to implement `hash32::Hash` for a `struct` is to use the `#[derive(Hash32)]`.
 //!
-//! ```
+//! Note that in *both* cases you need to *explicitly* depend on both `hash32` *and*
+//! `hash32_derive`; both crates must appear in your `Cargo.toml`.
+//!
+//! ## 2015 edition
+//!
+//! ``` ignore
+//! extern crate hash32;
 //! #[macro_use]
 //! extern crate hash32_derive;
 //!
@@ -29,12 +35,28 @@
 //! # fn main() {}
 //! ```
 //!
+//! ## 2018 edition
+//!
+//! ``` ignore
+//! use hash32_derive::Hash32;
+//!
+//! #[derive(Hash32)]
+//! struct Ipv4Addr([u8; 4]);
+//!
+//! # fn main() {}
+//!
+//! ```
 //! # Hashers
 //!
 //! This crate provides implementations of the following 32-bit hashing algorithms:
 //!
 //! - [Fowler-Noll-Vo](struct.FnvHasher.html)
 //! - [MurmurHash3](struct.Murmur3Hasher.html)
+//!
+//! # MSRV
+//!
+//! This crate is guaranteed to compile on stable Rust 1.25 and up. It *might* compile on older
+//! versions but that may change in any new patch release.
 //!
 //! # Future
 //!
