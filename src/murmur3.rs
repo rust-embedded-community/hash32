@@ -65,6 +65,7 @@ impl Hasher {
 }
 
 impl Default for Hasher {
+    #[allow(deprecated)]
     fn default() -> Self {
         Hasher {
             buf: unsafe { mem::uninitialized() },
