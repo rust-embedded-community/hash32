@@ -115,6 +115,26 @@ where
     }
 }
 
+impl<H> Clone for BuildHasherDefault<H>
+where
+    H: Default + Hasher,
+{
+    fn clone(&self) -> Self {
+        BuildHasherDefault::default()
+    }
+}
+
+impl<H> PartialEq for BuildHasherDefault<H>
+where
+    H: Default + Hasher,
+{
+    fn eq(&self, _other: &BuildHasherDefault<H>) -> bool {
+        true
+    }
+}
+
+impl<H: Default + Hasher> Eq for BuildHasherDefault<H> {}
+
 impl<H> BuildHasherDefault<H>
 where
     H: Default + Hasher,
@@ -343,7 +363,7 @@ tuple! { A B C D E F G H I J K L }
 
 #[cfg(test)]
 mod test {
-    use super::{Hash, Hasher, FnvHasher};
+    use super::{FnvHasher, Hash, Hasher};
     #[test]
     fn hashes_tuples() {
         let mut h = FnvHasher::default();
