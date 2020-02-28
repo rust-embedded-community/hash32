@@ -86,7 +86,7 @@
 extern crate byteorder;
 
 use core::marker::PhantomData;
-use core::{mem, slice};
+use core::{mem, slice, fmt};
 
 pub use fnv::Hasher as FnvHasher;
 pub use murmur3::Hasher as Murmur3Hasher;
@@ -134,6 +134,12 @@ where
 }
 
 impl<H: Default + Hasher> Eq for BuildHasherDefault<H> {}
+
+impl<H: Default + Hasher> fmt::Debug for BuildHasherDefault<H> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.pad("BuildHasherDefault")
+    }
+}
 
 impl<H> BuildHasherDefault<H>
 where
