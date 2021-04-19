@@ -80,7 +80,6 @@
 
 #![deny(missing_docs)]
 #![deny(warnings)]
-#![cfg_attr(feature = "const-fn", feature(const_fn))]
 #![no_std]
 
 extern crate byteorder;
@@ -98,8 +97,6 @@ mod murmur3;
 ///
 /// [0]: https://doc.rust-lang.org/core/hash/struct.BuildHasherDefault.html
 pub struct BuildHasherDefault<H>
-where
-    H: Default + Hasher,
 {
     _marker: PhantomData<H>,
 }
@@ -116,11 +113,8 @@ where
 }
 
 impl<H> BuildHasherDefault<H>
-where
-    H: Default + Hasher,
 {
     /// `const` constructor
-    #[cfg(feature = "const-fn")]
     pub const fn new() -> Self {
         BuildHasherDefault {
             _marker: PhantomData,
