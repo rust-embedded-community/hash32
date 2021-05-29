@@ -6,9 +6,8 @@ extern crate quote;
 extern crate syn;
 
 use proc_macro::TokenStream;
-use proc_macro2::Span;
-use quote::Tokens;
-use syn::{Data, DeriveInput, Fields, GenericParam, Generics, Ident, IntSuffix, LitInt};
+use proc_macro2::TokenStream as TokenStream2;
+use syn::{Data, DeriveInput, Fields, GenericParam, Generics};
 
 #[proc_macro_derive(Hash32)]
 pub fn derive_hash32(input: TokenStream) -> TokenStream {
@@ -18,7 +17,7 @@ pub fn derive_hash32(input: TokenStream) -> TokenStream {
     let generics = add_trait_bounds(input.generics);
     let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
 
-    let const_ = Ident::from(&*format!("__IMPL_HASH32_FOR_{}", name));
+    let const_ = format_ident!("__IMPL_HASH32_FOR_{}", name);
     let hash = compute_hash(&input.data);
     quote!(
         #[allow(non_upper_case_globals)]
@@ -31,7 +30,8 @@ pub fn derive_hash32(input: TokenStream) -> TokenStream {
                 }
              }
         };
-    ).into()
+    )
+    .into()
 }
 
 // Add a bound `T: Hash` to every type parameter T.
@@ -44,11 +44,11 @@ fn add_trait_bounds(mut generics: Generics) -> Generics {
     generics
 }
 
-fn compute_hash(data: &Data) -> Tokens {
+fn compute_hash(data: &Data) -> TokenStream2 {
     match *data {
         Data::Struct(ref data) => match data.fields {
             Fields::Named(ref fields) => {
-                let fnames = fields.named.iter().map(|f| f.ident);
+                let fnames = fields.named.iter().map(|f| &f.ident);
                 quote! {
                     #(
                         hash32::Hash::hash(&self.#fnames, _h);
@@ -56,15 +56,14 @@ fn compute_hash(data: &Data) -> Tokens {
                 }
             }
             Fields::Unnamed(ref fields) => {
-                let indices = (0..fields.unnamed.len())
-                    .map(|i| LitInt::new(i as u64, IntSuffix::None, Span::call_site()));
+                let indices = 0..fields.unnamed.len();
                 quote! {
                     #(
                         hash32::Hash::hash(&self.#indices, _h);
                     )*
                 }
             }
-            Fields::Unit => quote!{},
+            Fields::Unit => quote! {},
         },
         Data::Enum(..) | Data::Union(..) => {
             panic!("#[derive(Hash)] doesn't currently support `enum` and `union`")
