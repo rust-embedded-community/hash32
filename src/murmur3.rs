@@ -2,6 +2,8 @@ use core::{mem, slice};
 
 use byteorder::{ByteOrder, LE};
 
+use crate::Hasher as _;
+
 /// 32-bit MurmurHash3 hasher
 pub struct Hasher {
     buf: Buffer,
@@ -76,8 +78,8 @@ impl Default for Hasher {
     }
 }
 
-impl ::Hasher for Hasher {
-    fn finish(&self) -> u32 {
+impl crate::Hasher for Hasher {
+    fn finish32(&self) -> u32 {
         // tail
         let mut state = match self.index {
             Index::_3 => {
@@ -111,7 +113,9 @@ impl ::Hasher for Hasher {
 
         state
     }
+}
 
+impl core::hash::Hasher for Hasher {
     #[inline]
     fn write(&mut self, bytes: &[u8]) {
         let len = bytes.len();
@@ -167,6 +171,11 @@ impl ::Hasher for Hasher {
         // let tail = body.split_at(body.len() / 4 * 4).1;
 
         // self.push(tail);
+    }
+
+    #[inline]
+    fn finish(&self) -> u64 {
+        self.finish32().into()
     }
 }
 

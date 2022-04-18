@@ -1,18 +1,18 @@
-#[macro_use]
-extern crate hash32_derive;
 extern crate hash32;
 
-use hash32::{FnvHasher, Hash, Hasher};
+use std::hash::Hash;
 
-#[derive(Hash32)]
+use hash32::{FnvHasher, Hasher};
+
+#[derive(Hash)]
 struct Led {
     state: bool,
 }
 
-#[derive(Hash32)]
+#[derive(Hash)]
 struct Ipv4Addr([u8; 4]);
 
-#[derive(Hash32)]
+#[derive(Hash)]
 struct Generic<T> {
     inner: T,
 }
@@ -22,5 +22,5 @@ fn main() {
     Led { state: true }.hash(&mut fnv);
     Generic { inner: 0 }.hash(&mut fnv);
     Ipv4Addr([127, 0, 0, 1]).hash(&mut fnv);
-    println!("{}", fnv.finish())
+    println!("{}", fnv.finish32())
 }
