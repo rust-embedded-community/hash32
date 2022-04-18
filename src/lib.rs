@@ -8,29 +8,17 @@
 //!
 //! # Relationship to `core::hash`
 //!
-//! This crate exposes the same interfaces you'll find in [`core::hash`]: `Hash`, `Hasher`,
-//! `BuildHasher` and `BuildHasherDefault`. The main difference is that `hash32::Hasher::finish`
-//! returns a `u32` instead of `u64`, and the contract of `hash32::Hasher` forbids the implementer
-//! from performing 64-bit (or 128-bit) operations while computing the hash.
+//! This crate extends [`core::hash`] with a 32-bit version of `Hasher`, which extends
+//! `core::hash::Hasher`. It requires that the hasher only performs 32-bit operations when computing
+//! the hash, and adds [`finish32`] to get the hasher's result as a `u32`. The standard `finish`
+//! method should just zero-extend this result.
+//!
+//! Since it extends `core::hash::Hasher`, `Hasher` can be used with any type which implements the
+//! standard `Hash` trait.
 //!
 //! [`core::hash`]: https://doc.rust-lang.org/std/hash/index.html
+//! [`finish32`]: crate::Hasher::finish32
 //!
-//! # `#[derive(Hash32)]`
-//!
-//! The easiest way to implement `hash32::Hash` for a `struct` is to use the `#[derive(Hash32)]`.
-//!
-//! Note that you need to *explicitly* depend on both `hash32` *and* `hash32_derive`; both crates
-//! must appear in your `Cargo.toml`.
-//!
-//! ``` ignore
-//! use hash32_derive::Hash32;
-//!
-//! #[derive(Hash32)]
-//! struct Ipv4Addr([u8; 4]);
-//!
-//! # fn main() {}
-//!
-//! ```
 //! # Hashers
 //!
 //! This crate provides implementations of the following 32-bit hashing algorithms:
@@ -59,9 +47,6 @@
 //!     fn write(&mut self, bytes: &[u8]);
 //! }
 //! ```
-//!
-//! With this change a single `#[derive(Hash)]` would enough to make a type hashable with 32-bit and
-//! 64-bit hashers.
 
 #![deny(missing_docs)]
 #![deny(warnings)]
@@ -77,8 +62,8 @@ mod murmur3;
 
 /// An extension of [core::hash::Hasher][0] for hashers which use 32 bits.
 ///
-/// Typically, the standard `finish` method will just return a zero-extended version of the result
-/// of `finish32`.
+/// For hashers which implement this trait, the standard `finish` method should just return a
+/// zero-extended version of the result of `finish32`.
 ///
 /// [0]: https://doc.rust-lang.org/core/hash/trait.Hasher.html
 ///
@@ -87,7 +72,9 @@ mod murmur3;
 /// Implementers of this trait must *not* perform any 64-bit (or 128-bit) operation while computing
 /// the hash.
 pub trait Hasher: core::hash::Hasher {
-    /// See [`core::hash::Hasher.finish`][0]
+    /// The equivalent of [`core::hash::Hasher.finish`][0] for 32-bit hashers.
+    ///
+    /// This returns the hash directly; `finish` zero-extends it to 64 bits for compatibility.
     ///
     /// [0]: https://doc.rust-lang.org/std/hash/trait.Hasher.html#tymethod.finish
     fn finish32(&self) -> u32;
