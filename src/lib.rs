@@ -8,29 +8,20 @@
 //!
 //! # Relationship to `core::hash`
 //!
-//! This crate exposes the same interfaces you'll find in [`core::hash`]: `Hash`, `Hasher`,
-//! `BuildHasher` and `BuildHasherDefault`. The main difference is that `hash32::Hasher::finish`
-//! returns a `u32` instead of `u64`, and the contract of `hash32::Hasher` forbids the implementer
-//! from performing 64-bit (or 128-bit) operations while computing the hash.
+//! This crate extends [`core::hash`] with a 32-bit version of `Hasher`, which extends
+//! `core::hash::Hasher`. It requires that the hasher only performs 32-bit operations when computing
+//! the hash, and adds [`finish32`] to get the hasher's result as a `u32`. The standard `finish`
+//! method should just zero-extend this result.
+//!
+//! Since it extends `core::hash::Hasher`, `Hasher` can be used with any type which implements the
+//! standard `Hash` trait.
+//!
+//! This crate also adds a version of `BuildHasherDefault` with a const constructor, to work around
+//! the `core` version's lack of one.
 //!
 //! [`core::hash`]: https://doc.rust-lang.org/std/hash/index.html
+//! [`finish32`]: crate::Hasher::finish32
 //!
-//! # `#[derive(Hash32)]`
-//!
-//! The easiest way to implement `hash32::Hash` for a `struct` is to use the `#[derive(Hash32)]`.
-//!
-//! Note that you need to *explicitly* depend on both `hash32` *and* `hash32_derive`; both crates
-//! must appear in your `Cargo.toml`.
-//!
-//! ``` ignore
-//! use hash32_derive::Hash32;
-//!
-//! #[derive(Hash32)]
-//! struct Ipv4Addr([u8; 4]);
-//!
-//! # fn main() {}
-//!
-//! ```
 //! # Hashers
 //!
 //! This crate provides implementations of the following 32-bit hashing algorithms:
@@ -59,9 +50,6 @@
 //!     fn write(&mut self, bytes: &[u8]);
 //! }
 //! ```
-//!
-//! With this change a single `#[derive(Hash)]` would enough to make a type hashable with 32-bit and
-//! 64-bit hashers.
 
 #![deny(missing_docs)]
 #![deny(warnings)]
@@ -69,8 +57,9 @@
 
 extern crate byteorder;
 
+use core::fmt;
+use core::hash::BuildHasher;
 use core::marker::PhantomData;
-use core::{mem, slice, fmt};
 
 pub use fnv::Hasher as FnvHasher;
 pub use murmur3::Hasher as Murmur3Hasher;
@@ -78,18 +67,17 @@ pub use murmur3::Hasher as Murmur3Hasher;
 mod fnv;
 mod murmur3;
 
-/// See [`core::hash::BuildHasherDefault`][0] for details
+/// A copy of [`core::hash::BuildHasherDefault`][0], but with a const constructor.
+///
+/// This will eventually be deprecated once the version in `core` becomes const-constructible
+/// (presumably using `const Default`).
 ///
 /// [0]: https://doc.rust-lang.org/core/hash/struct.BuildHasherDefault.html
-pub struct BuildHasherDefault<H>
-{
+pub struct BuildHasherDefault<H> {
     _marker: PhantomData<H>,
 }
 
-impl<H> Default for BuildHasherDefault<H>
-where
-    H: Default + Hasher,
-{
+impl<H> Default for BuildHasherDefault<H> {
     fn default() -> Self {
         BuildHasherDefault {
             _marker: PhantomData,
@@ -97,34 +85,27 @@ where
     }
 }
 
-impl<H> Clone for BuildHasherDefault<H>
-where
-    H: Default + Hasher,
-{
+impl<H> Clone for BuildHasherDefault<H> {
     fn clone(&self) -> Self {
         BuildHasherDefault::default()
     }
 }
 
-impl<H> PartialEq for BuildHasherDefault<H>
-where
-    H: Default + Hasher,
-{
+impl<H> PartialEq for BuildHasherDefault<H> {
     fn eq(&self, _other: &BuildHasherDefault<H>) -> bool {
         true
     }
 }
 
-impl<H: Default + Hasher> Eq for BuildHasherDefault<H> {}
+impl<H> Eq for BuildHasherDefault<H> {}
 
-impl<H: Default + Hasher> fmt::Debug for BuildHasherDefault<H> {
+impl<H> fmt::Debug for BuildHasherDefault<H> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.pad("BuildHasherDefault")
     }
 }
 
-impl<H> BuildHasherDefault<H>
-{
+impl<H> BuildHasherDefault<H> {
     /// `const` constructor
     pub const fn new() -> Self {
         BuildHasherDefault {
@@ -135,7 +116,7 @@ impl<H> BuildHasherDefault<H>
 
 impl<H> BuildHasher for BuildHasherDefault<H>
 where
-    H: Default + Hasher,
+    H: Default + core::hash::Hasher,
 {
     type Hasher = H;
 
@@ -144,22 +125,10 @@ where
     }
 }
 
-/// See [`core::hash::BuildHasher`][0] for details
+/// An extension of [core::hash::Hasher][0] for hashers which use 32 bits.
 ///
-/// [0]: https://doc.rust-lang.org/core/hash/trait.BuildHasher.html
-pub trait BuildHasher {
-    /// See [`core::hash::BuildHasher::Hasher`][0]
-    ///
-    /// [0]: https://doc.rust-lang.org/std/hash/trait.BuildHasher.html#associatedtype.Hasher
-    type Hasher: Hasher;
-
-    /// See [`core::hash::BuildHasher.build_hasher`][0]
-    ///
-    /// [0]: https://doc.rust-lang.org/std/hash/trait.BuildHasher.html#tymethod.build_hasher
-    fn build_hasher(&self) -> Self::Hasher;
-}
-
-/// See [`core::hash::Hasher`][0] for details
+/// For hashers which implement this trait, the standard `finish` method should just return a
+/// zero-extended version of the result of `finish32`.
 ///
 /// [0]: https://doc.rust-lang.org/core/hash/trait.Hasher.html
 ///
@@ -167,197 +136,11 @@ pub trait BuildHasher {
 ///
 /// Implementers of this trait must *not* perform any 64-bit (or 128-bit) operation while computing
 /// the hash.
-pub trait Hasher {
-    /// See [`core::hash::Hasher.finish`][0]
+pub trait Hasher: core::hash::Hasher {
+    /// The equivalent of [`core::hash::Hasher.finish`][0] for 32-bit hashers.
+    ///
+    /// This returns the hash directly; `finish` zero-extends it to 64 bits for compatibility.
     ///
     /// [0]: https://doc.rust-lang.org/std/hash/trait.Hasher.html#tymethod.finish
-    fn finish(&self) -> u32;
-
-    /// See [`core::hash::Hasher.write`][0]
-    ///
-    /// [0]: https://doc.rust-lang.org/std/hash/trait.Hasher.html#tymethod.write
-    fn write(&mut self, bytes: &[u8]);
-}
-
-/// See [`core::hash::Hash`][0] for details
-///
-/// [0]: https://doc.rust-lang.org/core/hash/trait.Hash.html
-pub trait Hash {
-    /// Feeds this value into the given `Hasher`.
-    fn hash<H>(&self, state: &mut H)
-    where
-        H: Hasher;
-
-    /// Feeds a slice of this type into the given `Hasher`.
-    fn hash_slice<H>(data: &[Self], state: &mut H)
-    where
-        H: Hasher,
-        Self: Sized,
-    {
-        for piece in data {
-            piece.hash(state);
-        }
-    }
-}
-
-macro_rules! int {
-    ($ty:ident) => {
-        impl Hash for $ty {
-            fn hash<H>(&self, state: &mut H)
-            where
-                H: Hasher,
-            {
-                unsafe { state.write(&mem::transmute::<$ty, [u8; mem::size_of::<$ty>()]>(*self)) }
-            }
-
-            fn hash_slice<H>(data: &[Self], state: &mut H)
-            where
-                H: Hasher,
-            {
-                let newlen = data.len() * mem::size_of::<$ty>();
-                let ptr = data.as_ptr() as *const u8;
-                unsafe { state.write(slice::from_raw_parts(ptr, newlen)) }
-            }
-        }
-    };
-}
-
-int!(i16);
-int!(i32);
-int!(i64);
-int!(i8);
-int!(isize);
-int!(u16);
-int!(u32);
-int!(u64);
-int!(u8);
-int!(usize);
-
-impl Hash for bool {
-    fn hash<H>(&self, state: &mut H)
-    where
-        H: Hasher,
-    {
-        (*self as u8).hash(state)
-    }
-}
-
-impl Hash for char {
-    fn hash<H>(&self, state: &mut H)
-    where
-        H: Hasher,
-    {
-        (*self as u32).hash(state)
-    }
-}
-
-impl Hash for str {
-    fn hash<H>(&self, state: &mut H)
-    where
-        H: Hasher,
-    {
-        state.write(self.as_bytes());
-        state.write(&[0xff]);
-    }
-}
-
-impl<T> Hash for [T]
-where
-    T: Hash,
-{
-    fn hash<H>(&self, state: &mut H)
-    where
-        H: Hasher,
-    {
-        self.len().hash(state);
-        T::hash_slice(self, state);
-    }
-}
-
-macro_rules! array {
-    ($($n:expr),+) => {
-        $(
-            impl<T> Hash for [T; $n]
-                where
-                T: Hash,
-            {
-                fn hash<H>(&self, state: &mut H)
-                    where
-                    H: Hasher,
-                {
-                    Hash::hash(&self[..], state)
-                }
-            }
-        )+
-    };
-}
-
-array!(
-    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25,
-    26, 27, 28, 29, 30, 31, 32
-);
-
-impl<'a, T: ?Sized + Hash> Hash for &'a T {
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        (**self).hash(state);
-    }
-}
-
-impl<'a, T: ?Sized + Hash> Hash for &'a mut T {
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        (**self).hash(state);
-    }
-}
-
-impl Hash for () {
-    fn hash<H: Hasher>(&self, _state: &mut H) {}
-}
-
-macro_rules! tuple {
-    ( $($name:ident)+) => (
-        impl<$($name: Hash),*> Hash for ($($name,)*)
-            where
-            last_type!($($name,)+): ?Sized
-        {
-            #[allow(non_snake_case)]
-            fn hash<S: Hasher>(&self, state: &mut S) {
-                let ($(ref $name,)*) = *self;
-                $($name.hash(state);)*
-            }
-        }
-    );
-}
-
-macro_rules! last_type {
-    ($a:ident,) => { $a };
-    ($a:ident, $($rest_a:ident,)+) => { last_type!($($rest_a,)+) };
-}
-
-tuple! { A }
-tuple! { A B }
-tuple! { A B C }
-tuple! { A B C D }
-tuple! { A B C D E }
-tuple! { A B C D E F }
-tuple! { A B C D E F G }
-tuple! { A B C D E F G H }
-tuple! { A B C D E F G H I }
-tuple! { A B C D E F G H I J }
-tuple! { A B C D E F G H I J K }
-tuple! { A B C D E F G H I J K L }
-
-#[cfg(test)]
-mod test {
-    use super::{FnvHasher, Hash, Hasher};
-    #[test]
-    fn hashes_tuples() {
-        let mut h = FnvHasher::default();
-        ().hash(&mut h);
-        (1_usize,).hash(&mut h);
-        (1_u8, 2_i8).hash(&mut h);
-        (1_u16, 2_i16, 3_u32).hash(&mut h);
-        (1_i32, 2_u64, 3_i64, true).hash(&mut h);
-        (1_isize, 'a', "abc", [1u32, 2, 3, 4], false).hash(&mut h);
-        h.finish();
-    }
+    fn finish32(&self) -> u32;
 }

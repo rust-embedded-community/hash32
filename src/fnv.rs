@@ -1,3 +1,5 @@
+use crate::Hasher as _;
+
 const BASIS: u32 = 0x811c9dc5;
 const PRIME: u32 = 0x1000193;
 
@@ -12,17 +14,24 @@ impl Default for Hasher {
     }
 }
 
-impl ::Hasher for Hasher {
+impl crate::Hasher for Hasher {
     #[inline]
-    fn finish(&self) -> u32 {
+    fn finish32(&self) -> u32 {
         self.state
     }
+}
 
+impl core::hash::Hasher for Hasher {
     #[inline]
     fn write(&mut self, bytes: &[u8]) {
         for byte in bytes {
             self.state ^= u32::from(*byte);
             self.state = self.state.wrapping_mul(PRIME);
         }
+    }
+
+    #[inline]
+    fn finish(&self) -> u64 {
+        self.finish32().into()
     }
 }

@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- [breaking-change] Made `Hasher` a subtrait of `core::hash::Hasher`, and
+  renamed `finish` to `finish32` to avoid conflicting
+- Relaxed some restrictions on `BuildHasherDefault`
+
+### Removed
+
+- [breaking-change] Removed `Hash` in favour of `core::hash::Hash`
+- [breaking-change] Removed `BuildHasher` in favour of `core::hash::BuildHasher`
+
 ## [v0.2.1] - 2021-04-19
 
 ### Added
