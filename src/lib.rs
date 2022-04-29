@@ -54,11 +54,82 @@
 
 extern crate byteorder;
 
+use core::fmt;
+use core::hash::BuildHasher;
+use core::marker::PhantomData;
+
 pub use fnv::Hasher as FnvHasher;
 pub use murmur3::Hasher as Murmur3Hasher;
 
 mod fnv;
 mod murmur3;
+
+/// A copy of [`core::hash::BuildHasherDefault`][0], but with a const constructor.
+///
+/// This will eventually be deprecated once the version in `core` becomes const-constructible
+/// (presumably using `const Default`).
+///
+/// [0]: https://doc.rust-lang.org/core/hash/struct.BuildHasherDefault.html
+pub struct BuildHasherDefault<H> {
+    _marker: PhantomData<H>,
+}
+
+impl<H> Default for BuildHasherDefault<H>
+where
+    H: Default + Hasher,
+{
+    fn default() -> Self {
+        BuildHasherDefault {
+            _marker: PhantomData,
+        }
+    }
+}
+
+impl<H> Clone for BuildHasherDefault<H>
+where
+    H: Default + Hasher,
+{
+    fn clone(&self) -> Self {
+        BuildHasherDefault::default()
+    }
+}
+
+impl<H> PartialEq for BuildHasherDefault<H>
+where
+    H: Default + Hasher,
+{
+    fn eq(&self, _other: &BuildHasherDefault<H>) -> bool {
+        true
+    }
+}
+
+impl<H: Default + Hasher> Eq for BuildHasherDefault<H> {}
+
+impl<H: Default + Hasher> fmt::Debug for BuildHasherDefault<H> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.pad("BuildHasherDefault")
+    }
+}
+
+impl<H> BuildHasherDefault<H> {
+    /// `const` constructor
+    pub const fn new() -> Self {
+        BuildHasherDefault {
+            _marker: PhantomData,
+        }
+    }
+}
+
+impl<H> BuildHasher for BuildHasherDefault<H>
+where
+    H: Default + Hasher,
+{
+    type Hasher = H;
+
+    fn build_hasher(&self) -> Self::Hasher {
+        H::default()
+    }
+}
 
 /// An extension of [core::hash::Hasher][0] for hashers which use 32 bits.
 ///
