@@ -77,10 +77,7 @@ pub struct BuildHasherDefault<H> {
     _marker: PhantomData<H>,
 }
 
-impl<H> Default for BuildHasherDefault<H>
-where
-    H: Default + Hasher,
-{
+impl<H> Default for BuildHasherDefault<H> {
     fn default() -> Self {
         BuildHasherDefault {
             _marker: PhantomData,
@@ -88,27 +85,21 @@ where
     }
 }
 
-impl<H> Clone for BuildHasherDefault<H>
-where
-    H: Default + Hasher,
-{
+impl<H> Clone for BuildHasherDefault<H> {
     fn clone(&self) -> Self {
         BuildHasherDefault::default()
     }
 }
 
-impl<H> PartialEq for BuildHasherDefault<H>
-where
-    H: Default + Hasher,
-{
+impl<H> PartialEq for BuildHasherDefault<H> {
     fn eq(&self, _other: &BuildHasherDefault<H>) -> bool {
         true
     }
 }
 
-impl<H: Default + Hasher> Eq for BuildHasherDefault<H> {}
+impl<H> Eq for BuildHasherDefault<H> {}
 
-impl<H: Default + Hasher> fmt::Debug for BuildHasherDefault<H> {
+impl<H> fmt::Debug for BuildHasherDefault<H> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.pad("BuildHasherDefault")
     }
@@ -125,7 +116,7 @@ impl<H> BuildHasherDefault<H> {
 
 impl<H> BuildHasher for BuildHasherDefault<H>
 where
-    H: Default + Hasher,
+    H: Default + core::hash::Hasher,
 {
     type Hasher = H;
 
