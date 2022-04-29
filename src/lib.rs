@@ -16,6 +16,9 @@
 //! Since it extends `core::hash::Hasher`, `Hasher` can be used with any type which implements the
 //! standard `Hash` trait.
 //!
+//! This crate also adds a version of `BuildHasherDefault` with a const constructor, to work around
+//! the `core` version's lack of one.
+//!
 //! [`core::hash`]: https://doc.rust-lang.org/std/hash/index.html
 //! [`finish32`]: crate::Hasher::finish32
 //!
