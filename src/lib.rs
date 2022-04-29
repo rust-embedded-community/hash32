@@ -1,4 +1,4 @@
-//! 32-bit hashing machinery
+//! 32-bit hashing algorithms
 //!
 //! # Why?
 //!
@@ -29,27 +29,22 @@
 //! - [Fowler-Noll-Vo](struct.FnvHasher.html)
 //! - [MurmurHash3](struct.Murmur3Hasher.html)
 //!
+//! # Generic code
+//!
+//! In generic code, the trait bound `H: core::hash::Hasher` accepts *both* 64-bit hashers like
+//! `std::collections::hash_map::DefaultHasher`; and 32-bit hashers like the ones defined in this
+//! crate (`hash32::FnvHasher` and `hash32::Murmur3Hasher`)
+//!
+//! The trait bound `H: hash32::Hasher` is *more* restrictive as it only accepts 32-bit hashers.
+//!
+//! The `BuildHasherDefault<H>` type implements the `core::hash::BuildHasher` trait so it can
+//! construct both 32-bit and 64-bit hashers. To constrain the type to only produce 32-bit hasher
+//! you can add the trait bound `H::Hasher: hash32::Hasher`
+//!
 //! # MSRV
 //!
 //! This crate is guaranteed to compile on latest stable Rust. It *might* compile on older
 //! versions but that may change in any new patch release.
-//!
-//! # Future
-//!
-//! In the future we'd like to deprecate this crate in favor of making `core::hash::Hasher` generic
-//! over the size of the computed hash. Below is shown the planned change (but it doesn't work due
-//! to limitations in the `associated_type_defaults` feature):
-//!
-//! ``` ignore
-//! #![feature(associated_type_defaults)]
-//!
-//! trait Hasher {
-//!     type Hash = u64; // default type for backwards compatibility
-//!
-//!     fn finish(&self) -> Self::Hash; // changed
-//!     fn write(&mut self, bytes: &[u8]);
-//! }
-//! ```
 
 #![deny(missing_docs)]
 #![deny(warnings)]
