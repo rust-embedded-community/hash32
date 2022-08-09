@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [v0.3.1] - 2022-08-09
+
+### Fixed
+
+- fixed downstream clippy warnings around `murmur3::Hasher`
+
 ## [v0.3.0] - 2022-04-29
 
 ### Changed
@@ -50,7 +56,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 Initial release
 
-[Unreleased]: https://github.com/japaric/hash32/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/japaric/hash32/compare/v0.3.1...HEAD
+[v0.3.1]: https://github.com/japaric/hash32/compare/v0.3.0...v0.3.1
 [v0.3.0]: https://github.com/japaric/hash32/compare/v0.2.1...v0.3.0
 [v0.2.1]: https://github.com/japaric/hash32/compare/v0.2.0...v0.2.1
 [v0.2.0]: https://github.com/japaric/hash32/compare/v0.1.2...v0.2.0
