@@ -1,14 +1,14 @@
 on:
   push:
-    branches: [main]
+    branches: [main, staging, trying]
   pull_request:
     branches: [main]
 
 name: Continuous integration
 
 jobs:
-   test :
-    name: Test Suite
+  test :
+    name: test
     runs-on: ubuntu-latest
 
     strategy:
@@ -30,3 +30,13 @@ jobs:
         with:
           command: test
           args: --target ${{ matrix.target }}
+
+  ci-success:
+    name: ci
+    if: github.event_name == 'push' && success()
+    needs:
+      - test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Mark the job as a success
+        run: exit 0
