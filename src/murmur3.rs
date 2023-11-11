@@ -1,7 +1,5 @@
-use core::slice;
 use core::mem::MaybeUninit;
-
-use byteorder::{ByteOrder, LE};
+use core::slice;
 
 use crate::Hasher as _;
 
@@ -60,7 +58,11 @@ impl Hasher {
         // self.buf.bytes[start..start+len].copy_from(buf);
         for i in 0..len {
             unsafe {
-                *self.buf.bytes.assume_init_mut().get_unchecked_mut(start + i) = *buf.get_unchecked(i);
+                *self
+                    .buf
+                    .bytes
+                    .assume_init_mut()
+                    .get_unchecked_mut(start + i) = *buf.get_unchecked(i);
             }
         }
         self.index = Index::from(start + len);
@@ -71,7 +73,9 @@ impl Default for Hasher {
     #[allow(deprecated)]
     fn default() -> Self {
         Hasher {
-            buf: Buffer { bytes: MaybeUninit::uninit() },
+            buf: Buffer {
+                bytes: MaybeUninit::uninit(),
+            },
             index: Index::_0,
             processed: 0,
             state: State(0),
@@ -146,7 +150,11 @@ impl core::hash::Hasher for Hasher {
                 // self.buf.bytes[index..].copy_from_slice(head);
                 for i in 0..4 - index {
                     unsafe {
-                        *self.buf.bytes.assume_init_mut().get_unchecked_mut(index + i) = *head.get_unchecked(i);
+                        *self
+                            .buf
+                            .bytes
+                            .assume_init_mut()
+                            .get_unchecked_mut(index + i) = *head.get_unchecked(i);
                     }
                 }
 
@@ -192,7 +200,7 @@ const R1: u32 = 15;
 
 impl State {
     fn process_block(&mut self, block: &MaybeUninit<[u8; 4]>) {
-        self.0 ^= pre_mix(LE::read_u32(unsafe { block.assume_init_ref() }));
+        self.0 ^= pre_mix(u32::from_le_bytes(unsafe { *block.assume_init_ref() }));
         self.0 = self.0.rotate_left(13);
         self.0 = 5u32.wrapping_mul(self.0).wrapping_add(0xe6546b64);
     }
