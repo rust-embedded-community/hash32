@@ -54,8 +54,8 @@ use core::fmt;
 use core::hash::BuildHasher;
 use core::marker::PhantomData;
 
-pub use fnv::Hasher as FnvHasher;
-pub use murmur3::Hasher as Murmur3Hasher;
+pub use crate::fnv::Hasher as FnvHasher;
+pub use crate::murmur3::Hasher as Murmur3Hasher;
 
 mod fnv;
 mod murmur3;
