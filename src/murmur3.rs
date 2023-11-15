@@ -137,7 +137,7 @@ impl core::hash::Hasher for Hasher {
                 let mid = 4 - index;
                 let head = unsafe { slice::from_raw_parts(bytes.as_ptr(), mid) };
                 let body = unsafe {
-                    slice::from_raw_parts(bytes.as_ptr().offset(mid as isize), len - mid)
+                    slice::from_raw_parts(bytes.as_ptr().add(mid), len - mid)
                 };
 
                 // NOTE(unsafe) avoid calling `memcpy` on a 0-3 byte copy
