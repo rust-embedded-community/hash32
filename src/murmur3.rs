@@ -51,7 +51,10 @@ impl From<usize> for Index {
 }
 
 impl Hasher {
-    fn push(&mut self, buf: &[u8]) {
+    /// # Safety
+    ///
+    /// The caller must ensure that `self.index.usize() + buf.len() <= 4`.
+    unsafe fn push(&mut self, buf: &[u8]) {
         let start = self.index.usize();
         let len = buf.len();
         // NOTE(unsafe) avoid calling `memcpy` on a 0-3 byte copy
@@ -127,10 +130,13 @@ impl core::hash::Hasher for Hasher {
         self.processed += len as u32;
 
         let body = if self.index == Index::_0 {
+            // CASE 1
             bytes
         } else {
             let index = self.index.usize();
             if len + index >= 4 {
+                // CASE 2
+
                 // we can complete a block using the data left in the buffer
                 // NOTE(unsafe) avoid panicking branch (`slice_index_len_fail`)
                 // let (head, body) = bytes.split_at(4 - index);
@@ -154,6 +160,7 @@ impl core::hash::Hasher for Hasher {
 
                 body
             } else {
+                // CASE 3
                 bytes
             }
         };
@@ -163,7 +170,12 @@ impl core::hash::Hasher for Hasher {
                 self.state
                     .process_block(unsafe { &*(block.as_ptr() as *const _) });
             } else {
-                self.push(block);
+                // NOTE(unsafe) In this branch, `block.len() < 4`. For CASE 1 and CASE 2 above,
+                // `self.index.usize()` will be 0 here, so `self.index.usize() + block.len() < 4`.
+                // The condition for CASE 3 ensures that `self.index.usize() + bytes.len() < 4`.
+                unsafe {
+                    self.push(block);
+                }
             }
         }
 
