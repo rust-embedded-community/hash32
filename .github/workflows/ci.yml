@@ -3,11 +3,13 @@ on:
     branches: [main, staging, trying]
   pull_request:
     branches: [main]
+  merge_group:
+  workflow_dispatch:
 
 name: Continuous integration
 
 jobs:
-  test :
+  test:
     name: test
     runs-on: ubuntu-latest
 
@@ -18,25 +20,9 @@ jobs:
           - i686-unknown-linux-musl
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@master
         with:
-          profile: minimal
           toolchain: stable
           target: ${{ matrix.target }}
-          override: true
-
-      - uses: actions-rs/cargo@v1
-        with:
-          command: test
-          args: --target ${{ matrix.target }}
-
-  ci-success:
-    name: ci
-    if: github.event_name == 'push' && success()
-    needs:
-      - test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Mark the job as a success
-        run: exit 0
+      - run: cargo test --target=${{ matrix.target }}
