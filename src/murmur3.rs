@@ -61,7 +61,11 @@ impl Hasher {
         // self.buf.bytes[start..start+len].copy_from(buf);
         for i in 0..len {
             unsafe {
-                *self.buf.bytes.assume_init_mut().get_unchecked_mut(start + i) = *buf.get_unchecked(i);
+                *self
+                    .buf
+                    .bytes
+                    .assume_init_mut()
+                    .get_unchecked_mut(start + i) = *buf.get_unchecked(i);
             }
         }
         self.index = Index::from(start + len);
@@ -72,7 +76,9 @@ impl Default for Hasher {
     #[allow(deprecated)]
     fn default() -> Self {
         Hasher {
-            buf: Buffer { bytes: MaybeUninit::uninit() },
+            buf: Buffer {
+                bytes: MaybeUninit::uninit(),
+            },
             index: Index::_0,
             processed: 0,
             state: State(0),
@@ -142,15 +148,17 @@ impl core::hash::Hasher for Hasher {
                 // let (head, body) = bytes.split_at(4 - index);
                 let mid = 4 - index;
                 let head = unsafe { slice::from_raw_parts(bytes.as_ptr(), mid) };
-                let body = unsafe {
-                    slice::from_raw_parts(bytes.as_ptr().add(mid), len - mid)
-                };
+                let body = unsafe { slice::from_raw_parts(bytes.as_ptr().add(mid), len - mid) };
 
                 // NOTE(unsafe) avoid calling `memcpy` on a 0-3 byte copy
                 // self.buf.bytes[index..].copy_from_slice(head);
                 for i in 0..4 - index {
                     unsafe {
-                        *self.buf.bytes.assume_init_mut().get_unchecked_mut(index + i) = *head.get_unchecked(i);
+                        *self
+                            .buf
+                            .bytes
+                            .assume_init_mut()
+                            .get_unchecked_mut(index + i) = *head.get_unchecked(i);
                     }
                 }
 

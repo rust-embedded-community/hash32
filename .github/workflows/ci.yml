@@ -26,3 +26,14 @@ jobs:
           toolchain: stable
           target: ${{ matrix.target }}
       - run: cargo test --target=${{ matrix.target }}
+
+  style:
+    name: style
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt
+      - name: cargo fmt --check
+        run: cargo fmt --all -- --check
