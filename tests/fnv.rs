@@ -1,5 +1,3 @@
-extern crate hash32;
-
 use hash32::FnvHasher;
 use std::hash::Hasher;
 
