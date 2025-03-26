@@ -50,8 +50,6 @@
 #![deny(warnings)]
 #![no_std]
 
-extern crate byteorder;
-
 use core::fmt;
 use core::hash::BuildHasher;
 use core::marker::PhantomData;

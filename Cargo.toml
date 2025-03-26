@@ -7,7 +7,3 @@ license = "MIT OR Apache-2.0"
 name = "hash32"
 repository = "https://github.com/rust-embedded-community/hash32"
 version = "0.3.1"
-
-[dependencies.byteorder]
-default-features = false
-version = "1.2.2"

@@ -1,7 +1,5 @@
-use core::slice;
 use core::mem::MaybeUninit;
-
-use byteorder::{ByteOrder, LE};
+use core::slice;
 
 use crate::Hasher as _;
 
@@ -192,7 +190,7 @@ const R1: u32 = 15;
 
 impl State {
     fn process_block(&mut self, block: &MaybeUninit<[u8; 4]>) {
-        self.0 ^= pre_mix(LE::read_u32(unsafe { block.assume_init_ref() }));
+        self.0 ^= pre_mix(u32::from_le_bytes(unsafe { *block.assume_init_ref() }));
         self.0 = self.0.rotate_left(13);
         self.0 = 5u32.wrapping_mul(self.0).wrapping_add(0xe6546b64);
     }
