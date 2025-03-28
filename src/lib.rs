@@ -48,7 +48,12 @@
 
 #![deny(missing_docs)]
 #![deny(warnings)]
-#![warn(clippy::use_self, clippy::doc_markdown, clippy::ptr_as_ptr)]
+#![warn(
+    clippy::use_self,
+    clippy::doc_markdown,
+    clippy::ptr_as_ptr,
+    clippy::trivially_copy_pass_by_ref
+)]
 #![no_std]
 
 use core::fmt;

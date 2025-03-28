@@ -28,8 +28,8 @@ enum Index {
 }
 
 impl Index {
-    fn usize(&self) -> usize {
-        match *self {
+    fn usize(self) -> usize {
+        match self {
             Self::_0 => 0,
             Self::_1 => 1,
             Self::_2 => 2,
@@ -209,6 +209,7 @@ const C2: u32 = 0x1b873593;
 const R1: u32 = 15;
 
 impl State {
+    #[allow(clippy::trivially_copy_pass_by_ref)]
     fn process_block(&mut self, block: &MaybeUninit<[u8; 4]>) {
         self.0 ^= pre_mix(u32::from_le_bytes(unsafe { *block.assume_init_ref() }));
         self.0 = self.0.rotate_left(13);
