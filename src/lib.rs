@@ -46,9 +46,8 @@
 //! This crate is guaranteed to compile on latest stable Rust. It *might* compile on older
 //! versions but that may change in any new patch release.
 
-#![deny(missing_docs)]
-#![deny(warnings)]
 #![warn(
+    missing_docs,
     clippy::use_self,
     clippy::doc_markdown,
     clippy::ptr_as_ptr,
