@@ -30,10 +30,10 @@ enum Index {
 impl Index {
     fn usize(&self) -> usize {
         match *self {
-            Index::_0 => 0,
-            Index::_1 => 1,
-            Index::_2 => 2,
-            Index::_3 => 3,
+            Self::_0 => 0,
+            Self::_1 => 1,
+            Self::_2 => 2,
+            Self::_3 => 3,
         }
     }
 }
@@ -41,10 +41,10 @@ impl Index {
 impl From<usize> for Index {
     fn from(x: usize) -> Self {
         match x % 4 {
-            0 => Index::_0,
-            1 => Index::_1,
-            2 => Index::_2,
-            3 => Index::_3,
+            0 => Self::_0,
+            1 => Self::_1,
+            2 => Self::_2,
+            3 => Self::_3,
             _ => unreachable!(),
         }
     }
@@ -75,7 +75,7 @@ impl Hasher {
 impl Default for Hasher {
     #[allow(deprecated)]
     fn default() -> Self {
-        Hasher {
+        Self {
             buf: Buffer {
                 bytes: MaybeUninit::uninit(),
             },

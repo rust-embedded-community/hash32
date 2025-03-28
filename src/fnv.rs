@@ -14,7 +14,7 @@ pub struct Hasher {
 
 impl Default for Hasher {
     fn default() -> Self {
-        Hasher { state: BASIS }
+        Self { state: BASIS }
     }
 }
 
