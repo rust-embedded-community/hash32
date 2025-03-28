@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 
 - Removed the `byteorder` dependency.
+- Removed the `BuildHasherDefault` type.
+  - This type existed because `core::hash::BuildHasherDefault` did not have a const constructor.
+  - As of 1.85 core::hash::BuildHasherDefault has a const constructor.
 
 ## [v0.3.1] - 2022-08-09
 
