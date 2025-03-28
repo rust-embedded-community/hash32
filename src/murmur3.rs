@@ -176,7 +176,7 @@ impl core::hash::Hasher for Hasher {
         for block in body.chunks(4) {
             if block.len() == 4 {
                 self.state
-                    .process_block(unsafe { &*(block.as_ptr() as *const _) });
+                    .process_block(unsafe { &*(block.as_ptr().cast()) });
             } else {
                 // NOTE(unsafe) In this branch, `block.len() < 4`. For CASE 1 and CASE 2 above,
                 // `self.index.usize()` will be 0 here, so `self.index.usize() + block.len() < 4`.
