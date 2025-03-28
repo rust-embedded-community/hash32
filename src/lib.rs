@@ -26,8 +26,8 @@
 //!
 //! This crate provides implementations of the following 32-bit hashing algorithms:
 //!
-//! - [Fowler-Noll-Vo](struct.FnvHasher.html)
-//! - [MurmurHash3](struct.Murmur3Hasher.html)
+//! - [`FnvHasher`] Fowler-Noll-Vo 1a
+//! - [`Murmur3Hasher`] `MurmurHash3`
 //!
 //! # Generic code
 //!
@@ -48,7 +48,7 @@
 
 #![deny(missing_docs)]
 #![deny(warnings)]
-#![warn(clippy::use_self)]
+#![warn(clippy::use_self, clippy::doc_markdown)]
 #![no_std]
 
 use core::fmt;

@@ -3,7 +3,7 @@ use core::slice;
 
 use crate::Hasher as _;
 
-/// 32-bit MurmurHash3 hasher
+/// 32-bit `MurmurHash3` hasher
 pub struct Hasher {
     buf: Buffer,
     index: Index,
