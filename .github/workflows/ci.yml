@@ -46,3 +46,16 @@ jobs:
         with:
           components: clippy
       - run: cargo clippy --all --all-targets -- --deny warnings
+
+  rustdoc:
+    name: rustdoc
+    runs-on: ubuntu-latest
+    env: {"RUSTDOCFLAGS": "-D warnings"}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@nightly
+      # docs.rs builds documentation with:
+      # - nightly rust
+      # - all features
+      # - cargo rustdoc, not cargo doc
+      - run: cargo +nightly rustdoc --all-features
