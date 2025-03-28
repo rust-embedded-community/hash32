@@ -48,6 +48,7 @@
 
 #![deny(missing_docs)]
 #![deny(warnings)]
+#![warn(clippy::use_self)]
 #![no_std]
 
 use core::fmt;
@@ -72,7 +73,7 @@ pub struct BuildHasherDefault<H> {
 
 impl<H> Default for BuildHasherDefault<H> {
     fn default() -> Self {
-        BuildHasherDefault {
+        Self {
             _marker: PhantomData,
         }
     }
@@ -80,12 +81,12 @@ impl<H> Default for BuildHasherDefault<H> {
 
 impl<H> Clone for BuildHasherDefault<H> {
     fn clone(&self) -> Self {
-        BuildHasherDefault::default()
+        Self::default()
     }
 }
 
 impl<H> PartialEq for BuildHasherDefault<H> {
-    fn eq(&self, _other: &BuildHasherDefault<H>) -> bool {
+    fn eq(&self, _other: &Self) -> bool {
         true
     }
 }
@@ -101,7 +102,7 @@ impl<H> fmt::Debug for BuildHasherDefault<H> {
 impl<H> BuildHasherDefault<H> {
     /// `const` constructor
     pub const fn new() -> Self {
-        BuildHasherDefault {
+        Self {
             _marker: PhantomData,
         }
     }
