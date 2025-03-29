@@ -73,7 +73,6 @@ impl Hasher {
 }
 
 impl Default for Hasher {
-    #[allow(deprecated)]
     fn default() -> Self {
         Self {
             buf: Buffer {
