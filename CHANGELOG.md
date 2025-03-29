@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- Updated the edition from 2015 to 2021.
+
 ### Removed
 
 - Removed the `byteorder` dependency.
