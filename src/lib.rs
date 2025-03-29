@@ -16,9 +16,6 @@
 //! Since it extends `core::hash::Hasher`, `Hasher` can be used with any type which implements the
 //! standard `Hash` trait.
 //!
-//! This crate also adds a version of `BuildHasherDefault` with a const constructor, to work around
-//! the `core` version's lack of one.
-//!
 //! [`core::hash`]: https://doc.rust-lang.org/std/hash/index.html
 //! [`finish32`]: crate::Hasher::finish32
 //!
@@ -37,10 +34,6 @@
 //!
 //! The trait bound `H: hash32::Hasher` is *more* restrictive as it only accepts 32-bit hashers.
 //!
-//! The `BuildHasherDefault<H>` type implements the `core::hash::BuildHasher` trait so it can
-//! construct both 32-bit and 64-bit hashers. To constrain the type to only produce 32-bit hasher
-//! you can add the trait bound `H::Hasher: hash32::Hasher`
-//!
 //! # MSRV
 //!
 //! This crate is guaranteed to compile on latest stable Rust. It *might* compile on older
@@ -55,73 +48,11 @@
 )]
 #![no_std]
 
-use core::fmt;
-use core::hash::BuildHasher;
-use core::marker::PhantomData;
-
 pub use crate::fnv::Hasher as FnvHasher;
 pub use crate::murmur3::Hasher as Murmur3Hasher;
 
 mod fnv;
 mod murmur3;
-
-/// A copy of [`core::hash::BuildHasherDefault`][0], but with a const constructor.
-///
-/// This will eventually be deprecated once the version in `core` becomes const-constructible
-/// (presumably using `const Default`).
-///
-/// [0]: https://doc.rust-lang.org/core/hash/struct.BuildHasherDefault.html
-pub struct BuildHasherDefault<H> {
-    _marker: PhantomData<H>,
-}
-
-impl<H> Default for BuildHasherDefault<H> {
-    fn default() -> Self {
-        Self {
-            _marker: PhantomData,
-        }
-    }
-}
-
-impl<H> Clone for BuildHasherDefault<H> {
-    fn clone(&self) -> Self {
-        Self::default()
-    }
-}
-
-impl<H> PartialEq for BuildHasherDefault<H> {
-    fn eq(&self, _other: &Self) -> bool {
-        true
-    }
-}
-
-impl<H> Eq for BuildHasherDefault<H> {}
-
-impl<H> fmt::Debug for BuildHasherDefault<H> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.pad("BuildHasherDefault")
-    }
-}
-
-impl<H> BuildHasherDefault<H> {
-    /// `const` constructor
-    pub const fn new() -> Self {
-        Self {
-            _marker: PhantomData,
-        }
-    }
-}
-
-impl<H> BuildHasher for BuildHasherDefault<H>
-where
-    H: Default + core::hash::Hasher,
-{
-    type Hasher = H;
-
-    fn build_hasher(&self) -> Self::Hasher {
-        H::default()
-    }
-}
 
 /// An extension of [core::hash::Hasher][0] for hashers which use 32 bits.
 ///
