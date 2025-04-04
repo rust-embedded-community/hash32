@@ -54,22 +54,35 @@ pub use crate::murmur3::Hasher as Murmur3Hasher;
 mod fnv;
 mod murmur3;
 
-/// An extension of [core::hash::Hasher][0] for hashers which use 32 bits.
+/// An extension of [`core::hash::Hasher`] for 32-bit hashers.
 ///
-/// For hashers which implement this trait, the standard `finish` method should just return a
-/// zero-extended version of the result of `finish32`.
-///
-/// [0]: https://doc.rust-lang.org/core/hash/trait.Hasher.html
+/// For hashers that implement this trait, the [`core::hash::Hasher::finish`] method should return a
+/// zero-extended version of the result from [`Hasher::finish32`].
 ///
 /// # Contract
 ///
-/// Implementers of this trait must *not* perform any 64-bit (or 128-bit) operation while computing
+/// Implementers of this trait must **not** perform any 64-bit (or 128-bit) operation while computing
 /// the hash.
+///
+/// # Examples
+///
+/// ```
+/// use core::hash::{Hasher as _};
+/// use hash32::{FnvHasher, Hasher as _};
+///
+/// let mut hasher: FnvHasher = Default::default();
+///
+/// hasher.write_u32(1989);
+/// hasher.write_u8(11);
+/// hasher.write_u8(9);
+/// hasher.write(b"Huh?");
+///
+/// println!("Hash is {:x}!", hasher.finish32());
+/// ```
 pub trait Hasher: core::hash::Hasher {
-    /// The equivalent of [`core::hash::Hasher.finish`][0] for 32-bit hashers.
+    /// The equivalent of [`core::hash::Hasher::finish`] for 32-bit hashers.
     ///
-    /// This returns the hash directly; `finish` zero-extends it to 64 bits for compatibility.
-    ///
-    /// [0]: https://doc.rust-lang.org/std/hash/trait.Hasher.html#tymethod.finish
+    /// This returns the hash directly; [`core::hash::Hasher::finish`] zero-extends the `finish32`
+    /// result to 64-bits for compatibility.
     fn finish32(&self) -> u32;
 }
