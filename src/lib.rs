@@ -48,8 +48,8 @@
 )]
 #![no_std]
 
-pub use crate::fnv::Hasher as FnvHasher;
-pub use crate::murmur3::Hasher as Murmur3Hasher;
+pub use crate::fnv::FnvHasher;
+pub use crate::murmur3::Murmur3Hasher;
 
 mod fnv;
 mod murmur3;
