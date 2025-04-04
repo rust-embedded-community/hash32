@@ -13,6 +13,7 @@ pub struct FnvHasher {
 }
 
 impl Default for FnvHasher {
+    #[inline]
     fn default() -> Self {
         Self { state: BASIS }
     }
