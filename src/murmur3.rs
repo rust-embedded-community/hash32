@@ -4,7 +4,7 @@ use core::slice;
 use crate::Hasher as _;
 
 /// 32-bit `MurmurHash3` hasher
-pub struct Hasher {
+pub struct Murmur3Hasher {
     buf: Buffer,
     index: Index,
     processed: u32,
@@ -50,7 +50,7 @@ impl From<usize> for Index {
     }
 }
 
-impl Hasher {
+impl Murmur3Hasher {
     /// # Safety
     ///
     /// The caller must ensure that `self.index.usize() + buf.len() <= 4`.
@@ -72,7 +72,7 @@ impl Hasher {
     }
 }
 
-impl Default for Hasher {
+impl Default for Murmur3Hasher {
     fn default() -> Self {
         Self {
             buf: Buffer {
@@ -85,7 +85,7 @@ impl Default for Hasher {
     }
 }
 
-impl crate::Hasher for Hasher {
+impl crate::Hasher for Murmur3Hasher {
     fn finish32(&self) -> u32 {
         // tail
         let mut state = match self.index {
@@ -128,7 +128,7 @@ impl crate::Hasher for Hasher {
     }
 }
 
-impl core::hash::Hasher for Hasher {
+impl core::hash::Hasher for Murmur3Hasher {
     #[inline]
     fn write(&mut self, bytes: &[u8]) {
         let len = bytes.len();
