@@ -67,7 +67,7 @@ mod murmur3;
 /// # Examples
 ///
 /// ```
-/// use core::hash::{Hasher as _};
+/// use core::hash::Hasher as _;
 /// use hash32::{FnvHasher, Hasher as _};
 ///
 /// let mut hasher: FnvHasher = Default::default();
