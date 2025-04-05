@@ -185,16 +185,6 @@ impl core::hash::Hasher for Murmur3Hasher {
                 }
             }
         }
-
-        // XXX is this faster?
-        // for block in body.exact_chunks(4) {
-        //     self.state
-        //         .process_block(unsafe { &*(block.as_ptr() as *const _) });
-        // }
-
-        // let tail = body.split_at(body.len() / 4 * 4).1;
-
-        // self.push(tail);
     }
 
     #[inline]
