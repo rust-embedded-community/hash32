@@ -8,14 +8,19 @@
 //!
 //! # Relationship to `core::hash`
 //!
-//! This crate extends [`core::hash`] with a 32-bit version of `Hasher`, which extends
-//! `core::hash::Hasher`. It requires that the hasher only performs 32-bit operations when computing
-//! the hash, and adds [`finish32`] to get the hasher's result as a `u32`. The standard `finish`
-//! method should just zero-extend this result.
+//! This crate extends [`core::hash::Hasher`] with a 32-bit version, [`hash32::Hasher`].
 //!
-//! Since it extends `core::hash::Hasher`, `Hasher` can be used with any type which implements the
-//! standard `Hash` trait.
+//! The [`hash32::Hasher`] trait requires the hasher to perform only 32-bit operations when
+//! computing the hash.
+//! The trait method [`hash32::Hasher::finish32`] returns the hasher's result as a `u32`.
+//! The [`core::hash::Hasher::finish`] method zero-extends the [`hash32::Hasher::finish32`]
+//! result to a `u64`.
 //!
+//! Since [`hash32::Hasher`] extends [`core::hash::Hasher`], the [`hash32::Hasher`] trait can be
+//! used with any type which implements the [`core::hash::Hash`] trait.
+//!
+//! [`hash32::Hasher`]: crate::Hasher
+//! [`hash32::Hasher::finish32`]: crate::Hasher::finish32
 //! [`core::hash`]: https://doc.rust-lang.org/std/hash/index.html
 //! [`finish32`]: crate::Hasher::finish32
 //!
@@ -26,13 +31,27 @@
 //! - [`FnvHasher`] Fowler-Noll-Vo 1a
 //! - [`Murmur3Hasher`] `MurmurHash3`
 //!
+//! ## Picking a hasher
+//!
+//! - [`FnvHasher`] is faster and consumes less code space than [`Murmur3Hasher`].
+//! - [`Murmur3Hasher`] offers better collision resistance than [`FnvHasher`].
+//!
+//! ## Security
+//!
+//! Hashers provided by this crate are not cryptographically secure, and must **not** be used
+//! for security purposes.
+//! Additionally, unlike [`std::hash::DefaultHasher`] the provided hash algorithms lack
+//! denial-of-service protection, and must only be used with trusted data.
+//!
 //! # Generic code
 //!
-//! In generic code, the trait bound `H: core::hash::Hasher` accepts *both* 64-bit hashers like
-//! `std::collections::hash_map::DefaultHasher`; and 32-bit hashers like the ones defined in this
-//! crate (`hash32::FnvHasher` and `hash32::Murmur3Hasher`)
+//! In generic code, the trait bound `H: core::hash::Hasher` accepts **both** 64-bit hashers such
+//! as [`std::hash::DefaultHasher`]; and 32-bit hashers such as the ones defined in this crate,
+//! [`FnvHasher`], and [`Murmur3Hasher`].
 //!
-//! The trait bound `H: hash32::Hasher` is *more* restrictive as it only accepts 32-bit hashers.
+//! The trait bound `H: hash32::Hasher` is **more** restrictive as it only accepts 32-bit hashers.
+//!
+//! [`std::hash::DefaultHasher`]: https://doc.rust-lang.org/std/hash/struct.DefaultHasher.html
 //!
 //! # MSRV
 //!
