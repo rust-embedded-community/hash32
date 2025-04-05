@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- Added `Debug` implementations to hashers.
+
 ### Changed
 
 - Updated the edition from 2015 to 2021.
@@ -16,7 +20,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Removed the `byteorder` dependency.
 - Removed the `BuildHasherDefault` type.
   - This type existed because `core::hash::BuildHasherDefault` did not have a const constructor.
-  - As of 1.85 core::hash::BuildHasherDefault has a const constructor.
+  - As of 1.85 `core::hash::BuildHasherDefault` has a const constructor.
 
 ## [v0.3.1] - 2022-08-09
 
