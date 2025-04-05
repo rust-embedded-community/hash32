@@ -8,7 +8,7 @@ const PRIME: u32 = 0x1000193;
 /// Specifically this implements the [FNV-1a hash].
 ///
 /// [FNV-1a hash]: https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function#FNV-1a_hash
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct FnvHasher {
     state: u32,
 }

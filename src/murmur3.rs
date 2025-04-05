@@ -4,7 +4,7 @@ use core::slice;
 use crate::Hasher as _;
 
 /// 32-bit `MurmurHash3` hasher
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Murmur3Hasher {
     buf: Buffer,
     index: Index,
@@ -12,7 +12,7 @@ pub struct Murmur3Hasher {
     state: State,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 struct State(u32);
 
 #[derive(Debug, Clone, Copy)]
