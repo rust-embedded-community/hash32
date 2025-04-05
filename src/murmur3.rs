@@ -4,6 +4,7 @@ use core::slice;
 use crate::Hasher as _;
 
 /// 32-bit `MurmurHash3` hasher
+#[derive(Debug)]
 pub struct Murmur3Hasher {
     buf: Buffer,
     index: Index,
@@ -11,15 +12,16 @@ pub struct Murmur3Hasher {
     state: State,
 }
 
+#[derive(Debug)]
 struct State(u32);
 
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy)]
 #[repr(align(4))]
 struct Buffer {
     bytes: MaybeUninit<[u8; 4]>,
 }
 
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 enum Index {
     _0,
     _1,
