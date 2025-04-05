@@ -57,6 +57,38 @@
 //!
 //! This crate is guaranteed to compile on latest stable Rust. It *might* compile on older
 //! versions but that may change in any new patch release.
+//!
+//! # Examples
+//!
+//! ```
+//! use hash32::{FnvHasher, Hasher as _};
+//!
+//! #[derive(Hash)]
+//! struct Person {
+//!     id: u32,
+//!     name: &'static str,
+//!     phone: u64,
+//! }
+//!
+//! let person1 = Person {
+//!     id: 5,
+//!     name: "Janet",
+//!     phone: 555_666_7777,
+//! };
+//! let person2 = Person {
+//!     id: 5,
+//!     name: "Bob",
+//!     phone: 555_666_7777,
+//! };
+//!
+//! assert!(calculate_hash(&person1) != calculate_hash(&person2));
+//!
+//! fn calculate_hash<T: core::hash::Hash>(t: &T) -> u32 {
+//!     let mut fnv: FnvHasher = Default::default();
+//!     t.hash(&mut fnv);
+//!     fnv.finish32()
+//! }
+//! ```
 
 #![warn(
     missing_docs,
