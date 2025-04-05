@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 
 - Added `Debug` implementations to hashers.
+- Added `Clone` implementations to hashers.
 
 ### Changed
 
