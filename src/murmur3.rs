@@ -4,6 +4,18 @@ use core::slice;
 use crate::Hasher as _;
 
 /// 32-bit `MurmurHash3` hasher
+///
+/// # Examples
+///
+/// ```
+/// use core::hash::Hasher as _;
+/// use hash32::{Hasher as _, Murmur3Hasher};
+///
+/// let mut hasher: Murmur3Hasher = Default::default();
+/// hasher.write(b"Hello, World!");
+///
+/// println!("Hash is {:x}!", hasher.finish32());
+/// ```
 #[derive(Debug, Clone)]
 pub struct Murmur3Hasher {
     buf: Buffer,
